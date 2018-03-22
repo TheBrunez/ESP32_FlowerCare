@@ -1,8 +1,5 @@
 #include <FlowerCare_BLE.h>
 
-// TODO
-// check getData error, sometimes it won't connect to service or characteristic
-
 /*******************************************************************************
  *                                  PUBLIC
  ******************************************************************************/
