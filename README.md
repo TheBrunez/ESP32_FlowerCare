@@ -11,7 +11,7 @@ To discover the address of your flower care you can download the [nRF Connect ap
 * turn on the bluetooth on your smartphone and open the app
 * in the **scanner** tab you will see Flower Care device and the MAC address
 
-
+![nRF_screenshot](nRF_screenshot.jpg)
 
 ## License
 
