@@ -10,6 +10,8 @@ To discover the address of your flower care you can download the [nRF Connect ap
 * install the app
 * turn on the bluetooth on your smartphone and open the app
 * in the **scanner** tab you will see Flower Care device and the MAC address
+* use this address in the [example](https://github.com/Brunez3BD/ESP32_FlowerCare/blob/master/example/FlowerCare_getData.cpp)  
+`#define FLORA_ADDR "XX:XX:XX:XX:XX:XX"`
 
 ![nRF_screenshot](nRF_screenshot.png)
 
