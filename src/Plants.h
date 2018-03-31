@@ -160,13 +160,16 @@ enum Plant {
 #define VINES_VAL _HIGH, _ND, _ND, _ND
 #define YUCCA_VAL _HIGH, _ND, _ND, _ND
 
-// piante messe da piergiorgio
-/* #define [plantName]_VAL [temperatura],[acqua],[luce],
-                           [fertilità]
-*/
+// PIER
 #define ROSMARINUS_OFFICINALIS_VAL _MED, _LOW, _MED, _MED
 #define THYMUS_VULGARIS_VAL _MED, _LOW, _MED, _MED
 #define SALVIA_OFFICINALIS_LATIFOLIA_VAL _HIGH, _MED, _HIGH, _MED
 #define OCIMUM_BASILICUM_VAL _HIGH, _MED, _HIGH, _MED
+
+// piante messe da piergiorgio
+/* #define [plantName]_VAL [temperatura],[acqua],[luce],
+                           [fertilità]
+*/
+//  AGGIUNGERE PIANTE QUI SOTTO
 
 #endif
