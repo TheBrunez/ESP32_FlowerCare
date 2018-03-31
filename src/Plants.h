@@ -98,6 +98,11 @@ enum Plant {
   TRADESCANTIA,
   VINES,
   YUCCA,
+
+  ROSMARINUS_OFFICINALIS,
+  THYMUS_VULGARIS,
+  SALVIA_OFFICINALIS_LATIFOLIA,
+  OCIMUM_BASILICUM,
 };
 
 /* #define [plantName]_VAL [temp Level],[moist Level],[light Level],
@@ -155,11 +160,13 @@ enum Plant {
 #define VINES_VAL _HIGH, _ND, _ND, _ND
 #define YUCCA_VAL _HIGH, _ND, _ND, _ND
 
-//piante messe da piergiorgio
+// piante messe da piergiorgio
 /* #define [plantName]_VAL [temperatura],[acqua],[luce],
                            [fertilità]
 */
-
-#define ROSMARINUS_OFFICINALIS _LOW, _MED, _HIGH, _LOW
+#define ROSMARINUS_OFFICINALIS_VAL _MED, _LOW, _MED, _MED
+#define THYMUS_VULGARIS_VAL _MED, _LOW, _MED, _MED
+#define SALVIA_OFFICINALIS_LATIFOLIA_VAL _HIGH, _MED, _HIGH, _MED
+#define OCIMUM_BASILICUM_VAL _HIGH, _MED, _HIGH, _MED
 
 #endif
