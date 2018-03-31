@@ -1,5 +1,9 @@
 #include <FlowerCare_BLE.h>
 
+// TODO from connection to writing A0F1 to the characteristic I can't wait, so
+// it's better to delete connect() and disconnect() methods and put them inside
+// getData()
+
 /*******************************************************************************
  *                                  PUBLIC
  ******************************************************************************/
@@ -16,13 +20,10 @@ FlowerCare::FlowerCare(std::string addr) {
   _writeMode_uuid = new BLEUUID(WRITEMODE_UUID);
   _battVers_uuid = new BLEUUID(VERSIONBATTERY_UUID);
 
-  delay(1000);
-
   // initialize BLE and create client
   BLEDevice::init("");
 
   _BLEClient = BLEDevice::createClient();
-  delay(100);
 
   // initialize structure for incoming data
   _data = {};
@@ -57,73 +58,48 @@ FlowerCare::FlowerCare(std::string addr, Level temp_L, Level moist_L,
 }
 
 /**
- * @brief Connect to FlowerCare sensor
- *
- * @return 0 on success, otherwise an error code is returned
- */
-FC_RET_T FlowerCare::connect() {
-  if (!connected()) {
-    // Connect to the remote BLE Server.
-    if ((*_BLEClient).connect(*_addr)) {
-      delay(100);
-      return FLCARE_OK;
-    }
-
-    return ERR_CONNECT;
-  }
-
-  return ERR_ALREADYCONN;
-}
-
-/**
- * @brief Disconnect from FlowerCare sensor
- *
- * @return 0 on success, otherwise an error code is returned
- */
-FC_RET_T FlowerCare::disconnect() {
-  if (connected()) {
-    // Disconnect to the remote BLE Server.
-    _BLEClient->disconnect();
-    delay(100);
-    return FLCARE_OK;
-  }
-
-  return ERR_NOCONN;
-}
-
-/**
- * @brief Check BLE connection
- *
- * @return true  if device is connected
- * @return false otherwise
- */
-bool FlowerCare::connected() { return _BLEClient->isConnected(); }
-
-/**
  * @brief Get data from the sensor and save them in memory
  *
  * @return 0 on success, otherwise an error code is returned
  */
+
+// TODO solve all errors, also in FlowerCare::connect()
 FC_RET_T FlowerCare::getData() {
-  if (connected()) {
-    // The characteristic of the remote service we are interested in
+  if (_BLEClient->connect(*_addr)) {
     BLERemoteCharacteristic* pRemoteCharacteristic;
 
-    // Obtain a reference to the service we are after in the remote BLE
-    // server.
+    // get FlowerCare service
     BLERemoteService* pRemoteService = _BLEClient->getService(*_service_uuid);
     if (pRemoteService == nullptr) {
       return ERR_SERVICE;
     }
 
+    // write particular value to a characteristic to enable data reading
+    // TODO errors occour during this call to getCharacteristc(). In particular
+    // [E][BLERemoteCharacteristic.cpp:308] retrieveDescriptors():
+    //   esp_ble_gattc_get_all_descr: ESP_GATT_NOT_FOUND
+    // [E] [BLERemoteCharacteristic.cpp:315] retrieveDescriptors():
+    // [E] [BLERemoteCharacteristic.cpp:315] retrieveDescriptors():
+
     pRemoteCharacteristic = pRemoteService->getCharacteristic(*_writeMode_uuid);
     uint8_t buf[2] = {0xA0, 0x1F};
+
+    // TODO solve this
+    /* sometimes writeValue return the following errors:
+     * E (7224) BT: GATTC_Write GATT_BUSY conn_id = 3
+     * E (7228) BT: No pending command
+     * E (7236) BT: No pending command
+     * E (15382) BT: bta_gattc_conn_cback() - cif=3 connected=0 conn_id=3
+     *  reason=0x0013
+     *
+     * And after this the system is blocked
+     */
     pRemoteCharacteristic->writeValue(buf, 2, true);
 
-    delay(500);
+    // add small delay if necessary
+    // delay(100);
 
-    // Obtain a reference to the characteristic in the service of the remote
-    // BLE server.
+    // get characteristic containing data
     pRemoteCharacteristic =
         pRemoteService->getCharacteristic(*_sensorData_uuid);
 
@@ -132,19 +108,34 @@ FC_RET_T FlowerCare::getData() {
     }
 
     // Read the value of the characteristic.
+    // TODO check if reading successful
     std::string value = pRemoteCharacteristic->readValue();
 
     const char* val = value.c_str();
 
-    _data.temp = (val[0] + val[1] * 256) / 10;
+    /*
+    // print HEX format of the data characteristic
+    Serial.print("Hex: ");
+    for (int i = 0; i < 16; i++) {
+      Serial.print((int)val[i], HEX);
+      Serial.print(" ");
+    }
+    Serial.println(" ");
+    */
+
+    _data.temp = ((float)val[0] + val[1] * 256) / 10;
     _data.moist = val[7];
     _data.light = val[3] + val[4] * 256;
     _data.fert = val[8] + val[9] * 256;
 
+    // disconnect
+    _BLEClient->disconnect();
+
     return FLCARE_OK;
   }
 
-  return ERR_NOCONN;
+  // unable to connect
+  return ERR_CONNECT;
 }
 
 /**

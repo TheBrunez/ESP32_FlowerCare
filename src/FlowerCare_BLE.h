@@ -5,6 +5,7 @@
 
 /* TODO
  * battery check
+ * Temperatute - tenth of degree
  */
 
 /* two errors happens: during connection btc_gattc_call_handler()
@@ -15,6 +16,10 @@
 #include <Arduino.h>
 #include <BLEDevice.h>
 #include "Plants.h"
+
+/* SERVICES FOUND
+0000fe95-0000-1000-8000-00805f9b34fb
+*/
 
 // UUID for BLE, do some research
 #define SERVICE_UUID "00001204-0000-1000-8000-00805f9b34fb"
@@ -58,10 +63,6 @@ class FlowerCare {
   FlowerCare(std::string);
   FlowerCare(std::string, Plant);
   FlowerCare(std::string, Level, Level, Level, Level);
-
-  FC_RET_T connect();
-  FC_RET_T disconnect();
-  bool connected();
 
   FC_RET_T getData();
   float temp();
