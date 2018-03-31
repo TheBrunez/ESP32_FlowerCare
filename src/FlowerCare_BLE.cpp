@@ -475,6 +475,22 @@ bool FlowerCare::initPlant(Plant plant) {
       initLevel(YUCCA_VAL);
       return true;
 
+    case ROSMARINUS_OFFICINALIS:
+      initLevel(ROSMARINUS_OFFICINALIS_VAL);
+      return true;
+
+    case THYMUS_VULGARIS:
+      initLevel(THYMUS_VULGARIS_VAL);
+      return true;
+
+    case SALVIA_OFFICINALIS_LATIFOLIA:
+      initLevel(SALVIA_OFFICINALIS_LATIFOLIA_VAL);
+      return true;
+
+    case OCIMUM_BASILICUM:
+      initLevel(OCIMUM_BASILICUM_VAL);
+      return true;
+
     default:
       return false;
   }
