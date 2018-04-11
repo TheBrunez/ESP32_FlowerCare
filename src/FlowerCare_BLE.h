@@ -64,7 +64,7 @@ class FlowerCare {
   FlowerCare(std::string, Plant);
   FlowerCare(std::string, Level, Level, Level, Level);
 
-  FC_RET_T getData();
+  FC_RET_T getData(FlowerCareData_t* = NULL);
   float temp();
   int moist();
   int light();
