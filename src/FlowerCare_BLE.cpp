@@ -1,4 +1,5 @@
 #include <FlowerCare_BLE.h>
+#include <Global.h>
 
 // TODO from connection to writing A0F1 to the characteristic I can't wait, so
 // it's better to delete connect() and disconnect() methods and put them inside
@@ -64,7 +65,7 @@ FlowerCare::FlowerCare(std::string addr, Level temp_L, Level moist_L,
  */
 
 // TODO solve all errors, also in FlowerCare::connect()
-FC_RET_T FlowerCare::getData() {
+FC_RET_T FlowerCare::getData(FlowerCareData_t* dataPtr) {
   if (_BLEClient->connect(*_addr)) {
     BLERemoteCharacteristic* pRemoteCharacteristic;
 
@@ -75,31 +76,25 @@ FC_RET_T FlowerCare::getData() {
     }
 
     // write particular value to a characteristic to enable data reading
-    // TODO errors occour during this call to getCharacteristc(). In particular
+    // TODO errors occour during this call to getCharacteristic(). In particular
     // [E][BLERemoteCharacteristic.cpp:308] retrieveDescriptors():
     //   esp_ble_gattc_get_all_descr: ESP_GATT_NOT_FOUND
     // [E] [BLERemoteCharacteristic.cpp:315] retrieveDescriptors():
     // [E] [BLERemoteCharacteristic.cpp:315] retrieveDescriptors():
-
     pRemoteCharacteristic = pRemoteService->getCharacteristic(*_writeMode_uuid);
-    uint8_t buf[2] = {0xA0, 0x1F};
 
-    // TODO solve this
-    /* sometimes writeValue return the following errors:
-     * E (7224) BT: GATTC_Write GATT_BUSY conn_id = 3
-     * E (7228) BT: No pending command
-     * E (7236) BT: No pending command
-     * E (15382) BT: bta_gattc_conn_cback() - cif=3 connected=0 conn_id=3
-     *  reason=0x0013
-     *
-     * And after this the system is blocked
-     */
+    // 500 ms was fine
+    delay(200);
+
+    DEBUGLN((String)__FILE__ + "::line" + (String)__LINE__);
+    uint8_t buf[2] = {0xA0, 0x1F};
     pRemoteCharacteristic->writeValue(buf, 2, true);
 
     // add small delay if necessary
     // delay(100);
 
     // get characteristic containing data
+    DEBUGLN((String)__FILE__ + "::line" + (String)__LINE__);
     pRemoteCharacteristic =
         pRemoteService->getCharacteristic(*_sensorData_uuid);
 
@@ -109,6 +104,7 @@ FC_RET_T FlowerCare::getData() {
 
     // Read the value of the characteristic.
     // TODO check if reading successful
+    DEBUGLN((String)__FILE__ + "::line" + (String)__LINE__);
     std::string value = pRemoteCharacteristic->readValue();
 
     const char* val = value.c_str();
@@ -127,6 +123,10 @@ FC_RET_T FlowerCare::getData() {
     _data.moist = val[7];
     _data.light = val[3] + val[4] * 256;
     _data.fert = val[8] + val[9] * 256;
+
+    if (dataPtr != NULL) {
+      dataPtr = &_data;
+    }
 
     // disconnect
     _BLEClient->disconnect();
