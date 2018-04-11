@@ -25,14 +25,7 @@ void setup() {
 }
 
 void loop() {
-  // Connect to sensor
-  Serial.print("Connecting to sensor");
-  ret = flora->connect();
-  while (ret != FLCARE_OK) {
-    Serial.print(".");
-  }
-  Serial.println("\nConnected!");
-
+  
   // request data from sensor
   Serial.print("Getting data from sensor");
   ret = flora->getData();
@@ -54,9 +47,6 @@ void loop() {
   Serial.print("Soil EC: ");
   Serial.print(flora->fert());
   Serial.println("us/cm");
-
-  // disconnect from sensor
-  flora->disconnect();
 
   delay(TEN_MINUTES);
 }
