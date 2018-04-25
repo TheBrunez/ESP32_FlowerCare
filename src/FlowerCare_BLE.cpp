@@ -1,9 +1,8 @@
 #include <FlowerCare_BLE.h>
 #include <Global.h>
 
-// TODO from connection to writing A0F1 to the characteristic I can't wait, so
-// it's better to delete connect() and disconnect() methods and put them inside
-// getData()
+// TODO sequential call to getData() without resetting end with abort() before
+// row 72
 
 /*******************************************************************************
  *                                  PUBLIC
@@ -22,9 +21,7 @@ FlowerCare::FlowerCare(std::string addr) {
   _battVers_uuid = new BLEUUID(VERSIONBATTERY_UUID);
 
   // initialize BLE and create client
-  BLEDevice::init("");
-
-  _BLEClient = BLEDevice::createClient();
+  BLEDevice::init("");  // better do once for all objects
 
   // initialize structure for incoming data
   _data = {};
@@ -66,11 +63,14 @@ FlowerCare::FlowerCare(std::string addr, Level temp_L, Level moist_L,
 
 // TODO solve all errors, also in FlowerCare::connect()
 FC_RET_T FlowerCare::getData(FlowerCareData_t* dataPtr) {
+  _BLEClient = BLEDevice::createClient();
+
   if (_BLEClient->connect(*_addr)) {
     BLERemoteCharacteristic* pRemoteCharacteristic;
 
     // get FlowerCare service
     BLERemoteService* pRemoteService = _BLEClient->getService(*_service_uuid);
+
     if (pRemoteService == nullptr) {
       return ERR_SERVICE;
     }
@@ -84,9 +84,8 @@ FC_RET_T FlowerCare::getData(FlowerCareData_t* dataPtr) {
     pRemoteCharacteristic = pRemoteService->getCharacteristic(*_writeMode_uuid);
 
     // 500 ms was fine
-    delay(200);
+    delay(500);
 
-    DEBUGLN((String)__FILE__ + "::line" + (String)__LINE__);
     uint8_t buf[2] = {0xA0, 0x1F};
     pRemoteCharacteristic->writeValue(buf, 2, true);
 
@@ -94,7 +93,6 @@ FC_RET_T FlowerCare::getData(FlowerCareData_t* dataPtr) {
     // delay(100);
 
     // get characteristic containing data
-    DEBUGLN((String)__FILE__ + "::line" + (String)__LINE__);
     pRemoteCharacteristic =
         pRemoteService->getCharacteristic(*_sensorData_uuid);
 
@@ -104,7 +102,6 @@ FC_RET_T FlowerCare::getData(FlowerCareData_t* dataPtr) {
 
     // Read the value of the characteristic.
     // TODO check if reading successful
-    DEBUGLN((String)__FILE__ + "::line" + (String)__LINE__);
     std::string value = pRemoteCharacteristic->readValue();
 
     const char* val = value.c_str();
@@ -165,6 +162,25 @@ int FlowerCare::light() { return _data.light; }
  * @return  the last saved EC value, in us/cm
  */
 int FlowerCare::fert() { return _data.fert; }
+
+/**
+ * @brief Get string with all data
+ *
+ * @return a string with the formatted data
+ */
+String FlowerCare::dataStr() {
+  String str = "";
+  str += "Temperature: ";
+  str += (String)_data.temp;
+  str += "°C\nMoisture: ";
+  str += (String)_data.moist;
+  str += "%\nLight: ";
+  str += (String)_data.light;
+  str += "lux\nSoil EC: ";
+  str += (String)_data.fert;
+  str += "uS/cm\n";
+  return str;
+}
 
 /**
  * @brief Update the current data structure and give the temperature value
