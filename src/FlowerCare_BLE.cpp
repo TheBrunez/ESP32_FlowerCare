@@ -1,5 +1,4 @@
 #include <FlowerCare_BLE.h>
-#include <Global.h>
 
 // TODO sequential call to getData() without resetting end with abort() before
 // row 72
