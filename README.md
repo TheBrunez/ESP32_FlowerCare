@@ -3,6 +3,14 @@
 
 This library allow your ESP32 to request data from [Xiaomi Flower sensor](http://www.huahuacaocao.com/product)
 
+### Prerequisites
+
+Before using this library install BLE library. You can find it [HERE](https://github.com/nkolban/ESP32_BLE_Arduino)
+
+### Installing (Arduino IDE)
+
+For Arduino IDE installation follow the [Arduino Guide](https://www.arduino.cc/en/Guide/Libraries#toc4) to install it as a ZIP file. Be sure to match all the prerequisites defined in the previous paragraph
+
 ## Flower Care MAC address
 To discover the address of your flower care you can download the [nRF Connect app](https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp&hl=it) on your android phone.
 
