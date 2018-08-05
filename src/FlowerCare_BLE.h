@@ -5,21 +5,19 @@
 
 /* TODO
  * battery check
- * Temperatute - tenth of degree
  */
 
 /* two errors happens: during connection btc_gattc_call_handler()
  * and after getting data bta_gattc_conn_cback()
  * - cif=3 connected=0 conn_id=3 reason=0x0016
+ *
+ * try to implement handlers like in the examples
  */
 
 #include <Arduino.h>
 #include <BLEDevice.h>
+#include <string>
 #include "Plants.h"
-
-/* SERVICES FOUND
-0000fe95-0000-1000-8000-00805f9b34fb
-*/
 
 // UUID for BLE, do some research
 #define SERVICE_UUID "00001204-0000-1000-8000-00805f9b34fb"
@@ -64,11 +62,12 @@ class FlowerCare {
   FlowerCare(std::string, Plant);
   FlowerCare(std::string, Level, Level, Level, Level);
 
-  FC_RET_T getData();
+  FC_RET_T getData(FlowerCareData_t* = NULL);
   float temp();
   int moist();
   int light();
   int fert();
+  String dataStr();
 
   float getTemp();
   int getMoist();
